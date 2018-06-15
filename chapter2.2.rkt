@@ -4,11 +4,19 @@
 
 ;book append, reverse
 
-(define (list-ref list n)
-  (if (= n 0)
+;list-ref is 'get' function of list 
+(define (list-ref list index)
+  (if (= index 0)
       (car list)
-      (list-ref (cdr list) (- n 1))))
+      (list-ref (cdr list) (- index 1))))
 
+(define (append2 list1 list2)
+  (if (null? list1)
+      list2
+      (cons (car list1) (append2 (cdr list1) list2))
+      ))
+
+      
 
 (define (length list)
   (define (iter a count)
@@ -51,16 +59,16 @@
 (define (map1 items func)
   (if (null? (cdr items))
       (func (car items))
-  (cons (func (car items)) (map (cdr items) func))))
+  (cons (func (car items)) (map1 (cdr items) func))))
       
-(define (map proc items)
+(define (map2 proc items)
   (if (null? items)
       nil
       (cons (proc (car
 
 
                    ))
-            (map proc (cdr items)))))
+            (map2 proc (cdr items)))))
 
 
 ;2.21
@@ -212,21 +220,135 @@
 
 (define base1 '())
 
-(define (fringe l)
+(define (fringe1 l)
   (cond ((null? l) l)
-        ((list? (car l)) (append (fringe (car l)) (fringe (cdr l))))
-        (else (cons (car l) (fringe (cdr l))))))
+        ((list? (car l)) (append (fringe1 (car l)) (fringe1 (cdr l))))
+        (else (cons (car l) (fringe1 (cdr l))))))
 
-(define (L f)
-  (f c))
+;(define (L f)
+ ; (f c))
   
-(newline)
-(newline)
-(display (fringe randomTree)) ;1 2 3 4
-(newline)
-(display base1)
+;(newline)
+;(newline)
+;(display (fringe1 randomTree)) ;1 2 3 4
+;(newline)
+;(display base1)
 
 
+; using recursion with map, we can deal with tree-shaped data very efficiently.
+(define (fringe tree)
+  (if (null? tree)
+      tree
+      (append (fringe (car tree)) (fringe (cdr tree)))))
 
 
   
+;scale-tree
+
+
+(define (scale-tree tree factor)
+  (map (lambda (subtree)
+         (if (pair? subtree)
+             (scale-tree subtree factor)
+             (* factor subtree)))
+       tree))
+
+
+(define (square-tree tree)
+  (map (lambda (subtree)
+         (if (pair? subtree)
+             (square-tree subtree)
+             (* subtree subtree)))
+       tree))
+
+
+(define (square x)
+  (* x x))
+
+(define (tree-map tree func)
+  (map (lambda (subtree)
+         (if (pair? subtree)
+             (tree-map subtree func)
+             (func subtree)))
+       tree))
+
+(display
+ (tree-map
+   (list 1
+         (list 2 (list 3 4) 5)
+         (list 6 7))
+   square))
+
+
+; 2.2.3 COMMON INTERFACE.
+
+;---- fibonacci---------------------------------
+(define (fib n)
+   (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+   (cond ((= count 0) b)
+         ((even? count)
+          (fib-iter a
+                    b
+                    (+ (* p p) (* q q))     ; compute p'
+                    (+ (* 2 p q) (* q q))   ; compute q'
+                    (/ count 2)))
+         (else (fib-iter (+ (* b q) (* a q) (* a p))
+                         (+ (* b p) (* a q))
+                         p
+                         q
+                         (- count 1)))))
+;----------------------------------------------------
+
+
+
+(define (sum-odd-squares tree)
+  (cond ((null? tree) 0)
+        ((not (pair? tree))
+         (if (odd? tree) (square tree) 0))
+        (else (+ (sum-odd-squares (car tree))
+                 (sum-odd-squares (cdr tree))))))
+
+
+
+; filter
+
+(define (filter predicate seq)
+  (cond ((null? seq) nil)
+        ((predicate (car seq))
+         (cons (car seq) (filter predicate (cdr seq))))
+        (else
+         (filter predicate (cdr seq)))))
+
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+
+(newline)
+(newline)
+(display 'filterExample)
+(newline)
+(accumulate + 0 (list 1 2 3 4 5))
+(accumulate * 1 (list 1 2 3 4 5))
+
+(define (enumerate-interval low high)
+  (if (> low high)
+      nil
+      (cons low (enumerate-interval (+ low 1) high))))
+
+(define (list-fib-squares n)
+  (accumulate cons
+              nil
+              (map square
+                   (map fib
+                        (enumerate-interval 0 n)))))
+
+
+(define (map p sequence)
+  (accumulate (lambda (x y) (cons x y))
+
+:ㅈㅂ
+
