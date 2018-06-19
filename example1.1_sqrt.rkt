@@ -27,4 +27,11 @@
 (define (average x guess)
 (/ (+ x guess) 2))
 
+(define (good? x)
+  (< x 0.0001))
 
+
+
+(define (sqrt n startval)
+  (let (temp (/ n startval))
+    (if 
