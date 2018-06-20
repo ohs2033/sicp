@@ -239,6 +239,57 @@
         
 
 
+;2.24
+(define (drhelper tree base)
+  (if (null? tree)
+      base
+  (drhelper (cdr tree) (cons (dreverse (car tree)) base))))
+(define (dreverse tree)
+  (if (pair? tree)
+      (drhelper tree '())
+      tree))
+
+
+;2.29
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (left-branch mobile)
+  (car mobile))
+
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (branch-length br)
+  (car br))
+
+(define (branch-structure br)
+  (let ([x (car (cdr br))])
+    (if (pair? x) ;this must be branch.
+        (+ (branch-structure (left-branch x))
+           (branch-structure (right-branch x)))
+        x
+    
+    )))
+
+(define (total-weight mobile)
+  (+
+   (branch-length (left-branch mobile))
+   (branch-length (right-branch mobile))))
+
+           
+
+(define (list-fib-squares2 n)
+   (accumulate cons
+               nil (map square
+                    (map fib
+                         (enumerate-interval 0 n)))))
+
+
+
  ;2.28
 
 (define randomTree (list (list 1 2) (list 3 4)))
@@ -375,49 +426,28 @@
   (accumulate (lambda (x y) (cons x y))))
 
 
-;2.24
-(define (drhelper tree base)
-  (if (null? tree)
-      base
-  (drhelper (cdr tree) (cons (dreverse (car tree)) base))))
-(define (dreverse tree)
-  (if (pair? tree)
-      (drhelper tree '())
-      tree))
+ ;2.33
+ (define (map-ac p sequence)
+   (accumulate (lambda (x y) (cons (p x) y)) nil sequence))
+
+  ;UREKA!
+ (define (append-ac seq1 seq2)
+   (accumulate cons
+               (accumulate cons nil seq2)
+               seq1))
+
+ (define (length-ac sequence)
+   (accumulate (lambda (x y) (+ 1 y) ) 0 sequence))
 
 
-;2.29
-(define (make-mobile left right)
-  (list left right))
+;2.34 honer's rule
 
-(define (make-branch length structure)
-  (list length structure))
-
-(define (left-branch mobile)
-  (car mobile))
-
-(define (right-branch mobile)
-  (car (cdr mobile)))
-
-(define (branch-length br)
-  (car br))
-
-(define (branch-structure br)
-  (let ([x (car (cdr br))])
-    (if (pair? x) ;this must be branch.
-        (+ (branch-structure (left-branch x))
-           (branch-structure (right-branch x)))
-        x
-    
-    )))
-
-(define (total-weight mobile)
-  (+
-   (branch-length (left-branch mobile))
-   (branch-length (right-branch mobile))))
-
-
-        
+(define (honer-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-term)
+                (+ this-coeff (* x higher-term))
+                )
+              0
+              coefficient-sequence))
 
 
 
