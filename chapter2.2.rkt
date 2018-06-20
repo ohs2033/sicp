@@ -16,6 +16,13 @@
       (cons (car list1) (append2 (cdr list1) list2))
       ))
 
+(define (map func list)
+  (if (pair? list)
+      (cons (func (car list))
+            (map func (cdr list)))
+      list))
+
+
       
 
 (define (length list)
@@ -33,7 +40,15 @@
 (define (append list1 list2)
   (if (null? list1)
       list2
-      (cons (car list1) (append (cdr list1) list2))))
+      (if (pair? list1)
+          (if (and (not (pair? list2)) (not (null? list2)))
+              (append list1 (cons list2 nil))
+              (cons (car list1) (append (cdr list1) list2)))
+
+          (if (and (not (pair? list2)) (not (null? list2)))
+              (list list1 list2)
+              (cons list1 list2))
+      )))
 
 (define (reverse list return)
   (if (null? list)
@@ -189,7 +204,8 @@
 
   (iter '() list))
 
-
+(define (reverse-a tree)
+    (append (cdr tree) (car tree)))
 
 
 (define (deep-reverse list base)
@@ -212,6 +228,15 @@
 
 (display randomList)
 (display (dr2 randomList '()))
+
+(define (dr3 li)
+  (cond ((null? li)
+         nil)
+        ((list? li)
+         (append (dr3 (cdr li))
+                 (list (dr3 (car li)))))
+        (else li)))
+        
 
 
  ;2.28
@@ -242,7 +267,6 @@
       (append (fringe (car tree)) (fringe (cdr tree)))))
 
 
-  
 ;scale-tree
 
 
@@ -347,8 +371,54 @@
                         (enumerate-interval 0 n)))))
 
 
-(define (map p sequence)
-  (accumulate (lambda (x y) (cons x y))
+(define (map-a p sequence)
+  (accumulate (lambda (x y) (cons x y))))
 
-:ㅈㅂ
+
+;2.24
+(define (drhelper tree base)
+  (if (null? tree)
+      base
+  (drhelper (cdr tree) (cons (dreverse (car tree)) base))))
+(define (dreverse tree)
+  (if (pair? tree)
+      (drhelper tree '())
+      tree))
+
+
+;2.29
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (left-branch mobile)
+  (car mobile))
+
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (branch-length br)
+  (car br))
+
+(define (branch-structure br)
+  (let ([x (car (cdr br))])
+    (if (pair? x) ;this must be branch.
+        (+ (branch-structure (left-branch x))
+           (branch-structure (right-branch x)))
+        x
+    
+    )))
+
+(define (total-weight mobile)
+  (+
+   (branch-length (left-branch mobile))
+   (branch-length (right-branch mobile))))
+
+
+        
+
+
+
 
